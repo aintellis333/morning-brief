@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morning Brief — March 5, 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --surface: #0f0f0f;
+      --surface2: #161616;
+      --surface3: #1e1e1e;
+      --border: #2a2a2a;
+      --border2: #333;
+      --text: #e7e9ea;
+      --text2: #8b98a5;
+      --text3: #536471;
+      --accent: #1d9bf0;
+      --accent2: #1877f2;
+      --red: #f4212e;
+      --green: #00ba7c;
+      --yellow: #ffd400;
+      --orange: #ff7a00;
+      --purple: #7856ff;
+      --pink: #ff3cac;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 56px;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--accent); }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: var(--text3);
+      white-space: nowrap;
+    }
+
+    /* ── WEATHER WIDGET ── */
+    .weather-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 6px 14px;
+      font-size: 13px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .weather-icon { font-size: 16px; }
+    .weather-temp { font-weight: 600; color: var(--text); }
+    .weather-desc { color: var(--text2); }
+    .weather-humidity { color: var(--text3); font-size: 12px; }
+
+    /* ── TABS ── */
+    .tabs-wrap {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 56px;
+      z-index: 99;
+    }
+    .tabs {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      position: relative;
+      padding: 16px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text3);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s;
+      border: none;
+      background: none;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .badge {
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+      width: 100%;
+    }
+
+    /* ── HERO CARD ── */
+    .hero {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid var(--border);
+    }
+    .hero:hover { transform: translateY(-2px); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+
+    .hero-bg {
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a0a1a 40%, #1a0808 100%);
+      padding: 40px 40px 36px;
+      position: relative;
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(244,33,46,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse at 20% 80%, rgba(29,155,240,0.08) 0%, transparent 60%);
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(244,33,46,0.15);
+      border: 1px solid rgba(244,33,46,0.3);
+      color: #ff6b7a;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .hero-label::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 14px;
+      position: relative;
+      max-width: 700px;
+    }
+
+    .hero-snippet {
+      font-size: 15px;
+      color: var(--text2);
+      line-height: 1.6;
+      max-width: 640px;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .hero-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .hero-source {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .source-icon {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .hero-source-name { font-size: 13px; font-weight: 600; color: var(--text2); }
+    .hero-time { font-size: 12px; color: var(--text3); }
+    .hero-read {
+      margin-left: auto;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── CARD GRID ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    /* ── NEWS CARD ── */
+    .card {
+      background: var(--surface);
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .card:hover { background: var(--surface2); }
+    .card.expanded { background: var(--surface2); }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .card-source {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .card-source-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text3);
+    }
+
+    .card-meta {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--text3);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.1px;
+    }
+
+    .card-snippet {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-expand {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card.expanded .card-expand { max-height: 300px; }
+    .card.expanded .card-snippet {
+      -webkit-line-clamp: unset;
+      overflow: visible;
+    }
+
+    .card-full-text {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-read-link {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-read-link:hover { text-decoration: underline; }
+
+    .card-expand-btn {
+      font-size: 11px;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chevron { transition: transform 0.3s; display: inline-block; }
+    .card.expanded .chevron { transform: rotate(180deg); }
+
+    /* ── CAT COLORS ── */
+    .cat-top { background: linear-gradient(135deg, #1d9bf0, #0d6efd); }
+    .cat-ai { background: linear-gradient(135deg, #7856ff, #9c4fff); }
+    .cat-finance { background: linear-gradient(135deg, #00ba7c, #00a36c); }
+    .cat-tech { background: linear-gradient(135deg, #ff7a00, #e56b00); }
+    .cat-world { background: linear-gradient(135deg, #f4212e, #c91424); }
+    .cat-openclaw { background: linear-gradient(135deg, #ff3cac, #c0338d); }
+    .cat-email { background: linear-gradient(135deg, #ffd400, #e5be00); }
+
+    /* ── EMAIL & CALENDAR TAB ── */
+    .email-section { margin-bottom: 32px; }
+
+    .email-list {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .email-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .email-item:last-child { border-bottom: none; }
+    .email-item:hover { background: var(--surface2); }
+
+    .email-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .email-body { flex: 1; min-width: 0; }
+    .email-from {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .email-subject {
+      font-size: 13px;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .email-date {
+      font-size: 11px;
+      color: var(--text3);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .unread-dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 8px;
+    }
+
+    .cal-empty {
+      padding: 32px;
+      text-align: center;
+      color: var(--text3);
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .cal-empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+    /* ── CATEGORY PILL ON CARD ── */
+    .cat-pill {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      color: #000;
+    }
+
+    /* ── ALL TAB LAYOUT ── */
+    .all-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 900px) {
+      .all-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 22px; }
+      .hero-bg { padding: 28px 24px 24px; }
+    }
+
+    .sidebar-feed { display: flex; flex-direction: column; gap: 1px; }
+    .sidebar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sidebar-card:first-child { border-radius: 12px 12px 0 0; }
+    .sidebar-card:last-child { border-radius: 0 0 12px 12px; border-bottom: 1px solid var(--border); }
+    .sidebar-card:not(:last-child) { border-bottom: none; }
+    .sidebar-card:hover { background: var(--surface2); }
+
+    .sidebar-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .sidebar-card-meta {
+      font-size: 11px;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── FULL-WIDTH LIST ── */
+    .list-feed {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .list-item {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-item:hover { background: var(--surface2); }
+    .list-item.expanded { background: var(--surface2); }
+
+    .list-num {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--border2);
+      min-width: 32px;
+      line-height: 1;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .list-content { flex: 1; min-width: 0; }
+
+    .list-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 5px;
+      line-height: 1.35;
+    }
+    .list-snippet {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.55;
+    }
+    .list-expanded-text {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .list-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .list-footer-source {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text3);
+      font-weight: 500;
+    }
+    .list-time { font-size: 11px; color: var(--text3); }
+    .list-link {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .list-link:hover { text-decoration: underline; }
+
+    /* ── EMPTY STATE ── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--text3);
+      border-top: 1px solid var(--border);
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tab-content.active { animation: fadeIn 0.25s ease; }
+
+    /* ── TICKER ── */
+    .ticker {
+      background: var(--accent);
+      padding: 6px 0;
+      overflow: hidden;
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 60px;
+      animation: ticker-scroll 40s linear infinite;
+      white-space: nowrap;
+      width: max-content;
+    }
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ticker-sep { opacity: 0.5; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .topbar-inner { gap: 10px; }
+      .weather-desc, .weather-humidity { display: none; }
+      .logo { font-size: 15px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .main { padding: 16px 12px 40px; }
+      .hero-title { font-size: 20px; }
+      .hero-bg { padding: 20px 18px 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Ticker -->
+  <div class="ticker">
+    <div class="ticker-inner" id="tickerInner">
+      <span class="ticker-item">BREAKING: Operation Epic Fury — Iran strikes escalate into regional conflict <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">OpenAI raises $110B — SoftBank, Nvidia, Amazon lead <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">Dow futures wobble amid U.S.-Iran tensions <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">OpenClaw 'ClawJacked' flaw — update to v2026.2.25 immediately <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">Berkshire Hathaway: Greg Abel buys $15M in company stock <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">MWC 2026: Robot phones, 6G previews unveiled <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">BREAKING: Operation Epic Fury — Iran strikes escalate into regional conflict <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">OpenAI raises $110B — SoftBank, Nvidia, Amazon lead <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">Dow futures wobble amid U.S.-Iran tensions <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">OpenClaw 'ClawJacked' flaw — update to v2026.2.25 immediately <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">Berkshire Hathaway: Greg Abel buys $15M in company stock <span class="ticker-sep">|</span></span>
+      <span class="ticker-item">MWC 2026: Robot phones, 6G previews unveiled <span class="ticker-sep">|</span></span>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">Morning<span>Brief</span></div>
+      <div class="topbar-right">
+        <div class="weather-pill" id="weatherWidget">
+          <span class="weather-icon">🌧</span>
+          <span class="weather-temp" id="wTemp">4°C</span>
+          <span class="weather-desc" id="wDesc">Light rain, mist</span>
+          <span class="weather-humidity" id="wHumidity">· 93% humidity</span>
+        </div>
+        <div class="timestamp" id="genTime">Generated Thu Mar 5, 2026</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="tabs-wrap">
+    <div class="tabs" id="tabsRow">
+      <button class="tab active" data-tab="all">All</button>
+      <button class="tab" data-tab="top">Top News</button>
+      <button class="tab" data-tab="ai">AI &amp; Tech</button>
+      <button class="tab" data-tab="finance">Finance</button>
+      <button class="tab" data-tab="world">World</button>
+      <button class="tab" data-tab="openclaw">OpenClaw</button>
+      <button class="tab" data-tab="email">Email &amp; Cal <span class="badge" id="emailBadge">3</span></button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ALL TAB -->
+    <div class="tab-content active" id="tab-all">
+      <!-- Hero -->
+      <div class="hero" id="heroCard" onclick="window.open('https://www.defensenews.com/video/2026/02/28/pentagon-releases-footage-of-us-fighters-ships-launching-operation-epic-fury/', '_blank')">
+        <div class="hero-bg">
+          <div class="hero-label">Breaking</div>
+          <h1 class="hero-title">Operation Epic Fury: U.S. &amp; Israel Launch Massive Strikes on Iran — Khamenei Confirmed Dead</h1>
+          <p class="hero-snippet">The Pentagon released footage of U.S. fighters and warships launching coordinated strikes in what Secretary of War Pete Hegseth called "retribution long overdue." Iranian state media confirmed Supreme Leader Khamenei is dead. At least 555 deaths reported in Iran as retaliatory proxy strikes hit targets across the Middle East, including Dubai port. Four U.S. service members killed in Kuwait.</p>
+          <div class="hero-footer">
+            <div class="hero-source">
+              <div class="source-icon cat-world" style="color:#fff;">D</div>
+              <span class="hero-source-name">Defense News</span>
+              <span class="hero-time">· Feb 28, 2026</span>
+            </div>
+            <div class="hero-read">Read story →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All grid -->
+      <div class="all-grid">
+        <!-- Main column -->
+        <div>
+          <div class="section-head">
+            <span class="section-title">Top Stories</span>
+            <div class="section-line"></div>
+          </div>
+          <div class="cards-grid" id="allMainCards"></div>
+        </div>
+        <!-- Sidebar -->
+        <div>
+          <div class="section-head">
+            <span class="section-title">Quick Scan</span>
+            <div class="section-line"></div>
+          </div>
+          <div class="sidebar-feed" id="allSidebar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP NEWS TAB -->
+    <div class="tab-content" id="tab-top">
+      <div class="section-head">
+        <span class="section-title">Top News</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="list-feed" id="topList"></div>
+    </div>
+
+    <!-- AI & TECH TAB -->
+    <div class="tab-content" id="tab-ai">
+      <div class="section-head">
+        <span class="section-title">Artificial Intelligence &amp; Technology</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="list-feed" id="aiList"></div>
+    </div>
+
+    <!-- FINANCE TAB -->
+    <div class="tab-content" id="tab-finance">
+      <div class="section-head">
+        <span class="section-title">Financial Markets</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="list-feed" id="financeList"></div>
+    </div>
+
+    <!-- WORLD TAB -->
+    <div class="tab-content" id="tab-world">
+      <div class="section-head">
+        <span class="section-title">World &amp; Geopolitics</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="list-feed" id="worldList"></div>
+    </div>
+
+    <!-- OPENCLAW TAB -->
+    <div class="tab-content" id="tab-openclaw">
+      <div class="section-head">
+        <span class="section-title">OpenClaw AI</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="list-feed" id="openclawList"></div>
+    </div>
+
+    <!-- EMAIL & CAL TAB -->
+    <div class="tab-content" id="tab-email">
+      <div class="email-section">
+        <div class="section-head">
+          <span class="section-title">Unread Email</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="email-list" id="emailList"></div>
+      </div>
+      <div class="email-section">
+        <div class="section-head">
+          <span class="section-title">Today's Calendar</span>
+          <div class="section-line"></div>
+        </div>
+        <div id="calContent"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    Morning Brief · Generated <span id="footerTime"></span> · New York, NY ·
+    <a href="https://morning-brief-zeta-dusky.vercel.app" target="_blank">morning-brief-zeta-dusky.vercel.app</a>
+  </footer>
+
+</div>
+
+<script>
+const GENERATED = "Thursday, March 5, 2026 at 11:19 PM ET";
+
+const WEATHER = {
+  temp_c: 4,
+  temp_f: 39,
+  desc: "Light rain, mist",
+  humidity: 93,
+  wind_dir: "NE",
+  wind_mph: 12,
+  icon: "🌧"
+};
+
+const ARTICLES = [
+  // TOP NEWS
+  {
+    id: 1,
+    title: "Operation Epic Fury: U.S. & Israel Launch Massive Strikes on Iran",
+    snippet: "The Pentagon released footage of U.S. fighters and warships launching Operation Epic Fury against Iran. Secretary of War Pete Hegseth called it 'retribution long overdue.' Iranian state media confirmed Supreme Leader Khamenei is dead. At least 555 deaths reported in Iran.",
+    full: "The Pentagon released dramatic footage of U.S. Navy ships and Air Force fighters launching Operation Epic Fury — the largest coordinated military strike against Iran in modern history, conducted jointly with Israel. Secretary of War Pete Hegseth addressed the Joint Force from the Pentagon, declaring the era of 'politically correct wars' over. Retaliatory strikes from Iranian proxies hit targets across the Middle East, including missile debris sparking a fire at Dubai port. Four American service members were killed in Kuwait when three F-15E fighters were mistakenly downed by Kuwaiti air defenses during a multi-wave Iranian drone attack. Trump warned that additional casualties are 'likely.'",
+    source: "Defense News",
+    url: "https://www.defensenews.com/video/2026/02/28/pentagon-releases-footage-of-us-fighters-ships-launching-operation-epic-fury/",
+    category: "top",
+    time: "Feb 28"
+  },
+  {
+    id: 2,
+    title: "House Speaker Johnson: U.S. is 'Not at War' Despite Iran Strikes",
+    snippet: "House Speaker Mike Johnson attempted to reassure a jittery public that ongoing U.S. military strikes do not constitute an official declaration of war, even as combat losses mount and the conflict spreads regionally.",
+    full: "House Speaker Mike Johnson appeared before cameras to draw a distinction between the current military operation and a formal declaration of war, even as Congress debates the War Powers implications of Trump's unilateral authorization of Operation Epic Fury. Democrats and several Republicans have demanded the administration appear before classified briefings. Johnson acknowledged the seriousness of the situation but said the administration had clear legal authority to act.",
+    source: "NBC New York",
+    url: "https://www.nbcnewyork.com/video/news/national-international/mike-johnson-us-not-war/6473082/",
+    category: "top",
+    time: "Mar 6"
+  },
+  {
+    id: 3,
+    title: "Britney Spears Arrested on Suspicion of DUI",
+    snippet: "Pop icon Britney Spears was arrested Thursday afternoon on suspicion of driving under the influence in Los Angeles. She was released shortly after booking.",
+    full: "Los Angeles police arrested Britney Spears Thursday on suspicion of DUI. She was booked and released. A spokesperson for Spears said she is 'cooperating fully' and that the 'situation is being addressed.' The arrest comes during a period of high public visibility for the artist, who released her ninth studio album earlier this year.",
+    source: "NBC New York",
+    url: "https://www.nbcnewyork.com/video/news/national-international/britney-spears-released-dui-suspicion/6472811/",
+    category: "top",
+    time: "Mar 5"
+  },
+  {
+    id: 4,
+    title: "Wholesale Inflation Surges Past Predictions, Threatening Rate Cuts",
+    snippet: "January's Producer Price Index jumped well beyond analyst forecasts, rattling markets and raising serious doubts about the Federal Reserve's ability to proceed with planned interest rate cuts in 2026.",
+    full: "January's wholesale inflation data — the Producer Price Index — came in significantly above consensus forecasts, reigniting fears that the Federal Reserve's rate-cutting cycle may need to be put on hold. The data followed hotter-than-expected consumer inflation readings, forming a pattern that analysts say gives the Fed little room to ease in the near term. Markets sold off on the news before partially recovering.",
+    source: "Newser",
+    url: "https://www.newser.com/story/384515/wholesale-inflation-jumps-in-january-threatening-rate-cuts.html",
+    category: "top",
+    time: "Feb 27"
+  },
+
+  // AI / TECH
+  {
+    id: 5,
+    title: "OpenAI Secures Record-Breaking $110B Funding Round",
+    snippet: "OpenAI announced a landmark $110 billion investment round led by SoftBank ($30B), Nvidia ($30B), and Amazon ($50B) under the banner 'Scaling AI for Everyone,' signaling a new phase in frontier AI commercialization.",
+    full: "OpenAI's landmark $110 billion raise is the largest single funding event in the history of technology. The company simultaneously launched the OpenAI Frontier Alliance with BCG, McKinsey, Accenture, and Capgemini to help enterprises move AI from pilots to production deployments. OpenAI also announced a major expansion of its London research hub, set to become its largest center outside the U.S., focused on safety evaluation and model performance. CEO Sam Altman framed the raise as necessary to fund the infrastructure required for AGI-level compute.",
+    source: "The Next Web",
+    url: "https://thenextweb.com/news/openai-secures-record-breaking-110b-funding-to-scale-ai-for-everyone",
+    category: "ai",
+    time: "Feb 27"
+  },
+  {
+    id: 6,
+    title: "China's MiniMax M2.5 Rivals Claude Opus at 1/10th the Price — UBS Initiates Buy",
+    snippet: "While DeepSeek speculation grows, MiniMax's M2.5 model has captured one-third of Anthropic's usage share on OpenRouter at a fraction of the cost. UBS initiated coverage with a Buy rating and HKD 1,000 price target.",
+    full: "MiniMax, which only listed on the Hong Kong exchange in January 2026, released its M2.5 model in mid-February to immediate developer enthusiasm. Data from OpenRouter showed MiniMax's usage reaching one-third of Anthropic Claude's share at one-tenth the price — a cost efficiency ratio that's driving enterprise adoption. The Chinese company distinguishes itself with a full stack: text, video generation (comparable to Sora), audio synthesis (ElevenLabs-grade), and AI companionship products. UBS analysts said they are 'positive on MiniMax's potential upside in gaining share in the global enterprise market.'",
+    source: "CNBC",
+    url: "https://www.cnbc.com/2026/03/01/forget-deepseek-of-chinas-5-new-ai-models-ubs-prefers-this-one.html",
+    category: "ai",
+    time: "Mar 1"
+  },
+  {
+    id: 7,
+    title: "'Humanity's Last Exam' Launched — AI Struggles with True Expert-Level Questions",
+    snippet: "Nearly 1,000 researchers across every discipline — physics, linguistics, medicine, history — built an AI benchmark so specialized that today's leading models struggle to pass it, exposing the real gaps in frontier AI capability.",
+    full: "Published in Nature, the 'Humanity's Last Exam' (HLE) benchmark was designed by researchers from nearly every academic discipline specifically because existing benchmarks like MMLU had become too easy for frontier models. The exam includes questions so deep in specialist knowledge that even leading experts struggle — testing whether AI can truly reason at the frontier of human knowledge. Early evaluations show that even the most capable AI systems fail significantly on the hardest questions, suggesting we are still far from true expert-level generalization across domains.",
+    source: "SciTechDaily",
+    url: "https://scitechdaily.com/dont-panic-yet-humanitys-last-exam-has-begun/",
+    category: "ai",
+    time: "Feb 28"
+  },
+  {
+    id: 8,
+    title: "Meta Launches Applied AI Engineering Division to Accelerate Model Performance",
+    snippet: "Meta is building a new Applied AI Engineering organization focused on real-world data, reinforcement learning workflows, and feedback loops to dramatically accelerate AI research and close the gap with competitors.",
+    full: "According to reporting in the Wall Street Journal, Meta's new Applied AI Engineering organization represents a structural shift in how the company develops AI. Teams will be focused on collecting real-world feedback, running reinforcement learning from human feedback (RLHF) at scale, and accelerating evaluation loops for new model versions. The move comes as Meta's Llama models face intensifying competition from OpenAI's GPT series, Anthropic's Claude, and a wave of Chinese models.",
+    source: "Newsweek",
+    url: "https://www.newsweek.com/nw-ai/ai-impact-are-your-teams-quietly-replacing-saas-11620488",
+    category: "ai",
+    time: "Mar 4"
+  },
+  {
+    id: 9,
+    title: "Agentic AI Accounting Platform Basis Hits $1.15B Unicorn Valuation",
+    snippet: "Basis, founded in 2023, closed a $100M Series B at a $1.15B valuation. The platform deploys 'long-horizon' AI agents capable of completing complex account workflows across client services, tax, and audit practices.",
+    full: "Basis operates what it calls an 'agentic AI accounting platform' — deploying agents that can autonomously complete multi-step workflows across tax preparation, audit, and client services. The company is one of the clearest examples of the 'agentic AI unicorn' wave, where AI companies are valued not on model capabilities but on vertical workflow automation. The $100M Series B will fund expansion of engineering and ML teams. Basis competes with traditional accounting software from SAP, Oracle, and Sage, but targets CPA and audit firms as its primary customers.",
+    source: "FinTech Futures",
+    url: "https://www.fintechfutures.com/ai-in-fintech/february-2026-top-five-ai-stories-of-the-month",
+    category: "ai",
+    time: "Feb 27"
+  },
+  {
+    id: 10,
+    title: "OpenAI's First Hardware Product: A ChatGPT Smart Speaker with Camera",
+    snippet: "OpenAI's first physical consumer device appears to be a smart speaker with an integrated camera — potentially challenging Amazon Echo and Google Nest while blending ambient AI with visual understanding.",
+    full: "Sources and regulatory filings suggest OpenAI's first consumer hardware product will be an ambient AI device combining a smart speaker form factor with an always-on camera for visual understanding. The device would allow ChatGPT to observe its environment, answer visual questions, and proactively provide assistance. This would represent OpenAI's entry into the smart home market, directly competing with Amazon's Alexa ecosystem and Google's Nest lineup. The project reportedly involves design collaboration with former Apple designer Jony Ive.",
+    source: "Forbes",
+    url: "https://www.forbes.com/sites/quickerbettertech/2026/02/28/small-business-technology-news-a-chatgpt-smart-speaker/",
+    category: "ai",
+    time: "Feb 28"
+  },
+  {
+    id: 11,
+    title: "Apple's Chip Homecoming: Inside the U.S. Semiconductor Manufacturing Push",
+    snippet: "A WSJ reporter toured Apple's U.S. chip facilities in Texas and Arizona — including 35-foot silicon cylinder machines and $400M EUV lithography equipment — as Apple bets big on domestic chip production.",
+    full: "Apple is helping to rebuild American semiconductor manufacturing through major investments in facilities in Texas and Arizona. The WSJ's tour revealed awe-inspiring equipment: a 35-foot cylinder that produces 600-pound torpedoes of pure silicon, ceiling-mounted wafer transport systems, and ASML's most advanced EUV machines costing $400M each. The push is driven partly by geopolitical risk reduction and partly by Trump administration incentives under the CHIPS Act. While the facilities are highly automated, they represent a genuine re-onshoring of critical technology.",
+    source: "Wall Street Journal",
+    url: "https://www.wsj.com/tech/apples-chip-homecoming-a5a15848",
+    category: "ai",
+    time: "Mar 1"
+  },
+  {
+    id: 12,
+    title: "MWC 2026: Robot Phones, Smart Glasses, and the First Real 6G Preview",
+    snippet: "Mobile World Congress opened with a wave of hardware reveals: TCL's 'robot phone,' Honor's humanoid robot, new Motorola foldables, Xiaomi's 17 Ultra, and carriers showing off early 6G demos for the first time.",
+    full: "Mobile World Congress 2026 in Barcelona delivered its most ambitious showcase in years. TCL unveiled the X11L 'robot phone' with programmable physical transformations and Super Quantum Dot display technology. Honor debuted its first humanoid robot. Motorola showed a razor-fold premium foldable with a luxury finish. Samsung followed up Galaxy Unpacked with additional Galaxy AI demonstrations. Perhaps most significant: multiple carriers demonstrated early-stage 6G technology, promising 100x faster speeds than current 5G networks with sub-millisecond latency — targeting deployment in the 2030s.",
+    source: "CNET",
+    url: "https://www.cnet.com/videos/a-robot-phone-new-smart-glasses-and-6g-previewing-mwc-tech-today/",
+    category: "ai",
+    time: "Feb 28"
+  },
+
+  // FINANCE
+  {
+    id: 13,
+    title: "U.S. Stock Futures Wobble Amid Rising Iran Tensions",
+    snippet: "Markets opened cautiously Thursday as Operation Epic Fury continued to escalate. Oil stocks surged on supply disruption fears, while Palantir and other defense names rallied. Broader indices remained under pressure.",
+    full: "U.S. equity futures struggled for direction Thursday as geopolitical risk from the Iran conflict weighed on sentiment. WTI crude oil jumped more than 4% on fears that the Strait of Hormuz could be disrupted, lifting energy stocks broadly. Defense contractors including Palantir (PLTR), Lockheed Martin (LMT), and Northrop Grumman (NOC) rallied sharply. Tech stocks underperformed as risk-off sentiment took hold. The S&P 500 is down roughly 8% from its February highs.",
+    source: "TipRanks",
+    url: "https://www.tipranks.com/news/why-are-stock-market-futures-up-today-3-4-26",
+    category: "finance",
+    time: "Mar 5"
+  },
+  {
+    id: 14,
+    title: "Berkshire's New CEO Greg Abel Buys $15M in Stock, Buybacks Resume",
+    snippet: "In a confidence signal, Berkshire Hathaway's new CEO Greg Abel purchased $15 million in company stock — equal to his entire after-tax salary — as Berkshire simultaneously restarted its share repurchase program.",
+    full: "Greg Abel's $15M personal stock purchase was disclosed in an SEC filing, representing a deliberate signal to Berkshire shareholders that the transition from Warren Buffett is in capable hands. The simultaneous restart of Berkshire's buyback program — which Buffett had paused when he felt shares were too expensive — suggests Abel believes current prices are attractive. Berkshire Hathaway Class B shares (BRKB) have underperformed the S&P 500 since Buffett's retirement announcement, making Abel's purchase particularly meaningful as a value statement.",
+    source: "Investor's Business Daily",
+    url: "https://www.investors.com/news/berkshire-hathaway-warren-buffett-greg-abel-stock-repurchase/",
+    category: "finance",
+    time: "Mar 5"
+  },
+  {
+    id: 15,
+    title: "Nvidia Stock Extends Gains After 2% Wednesday Rally",
+    snippet: "Nvidia shares rose again Thursday, extending Wednesday's 2% gain on continued AI infrastructure demand and strong data center bookings, even as broader markets faced Iran-related headwinds.",
+    full: "Nvidia's continued strength defies broader market weakness, as investors view AI infrastructure spending as resilient to geopolitical shocks. The company's H200 and upcoming Blackwell GPUs remain on allocation with 12+ month lead times. Multiple analyst upgrades cited the company's data center revenue trajectory — which some models project to reach $200B annually by late 2026. ElevenLabs and Google Cloud separately announced expanded Nvidia Blackwell GPU deployments. NVDA is up approximately 18% year-to-date despite the broader market pullback.",
+    source: "TipRanks",
+    url: "https://www.tipranks.com/news/nvidia-stock-is-rising-again-after-a-2-gain-on-wednesday-whats-driving-the-rally",
+    category: "finance",
+    time: "Mar 5"
+  },
+  {
+    id: 16,
+    title: "Dow Off Lows After Iran Strikes; Oil Stocks Lead, Defense Names Surge",
+    snippet: "Markets initially plunged on the Iran conflict news before paring losses. WTI crude jumped 6%. Palantir soared as the market's poster child for AI-powered defense spending.",
+    full: "The market's initial reaction to Operation Epic Fury was sharp selling across risk assets. The Dow fell nearly 600 points at the open before recovering more than half those losses by afternoon. Crude oil (WTI) surged 6.2% — its largest single-day gain in over a year — on fears about Middle East supply disruption. Defense stocks staged their biggest rally in years: Palantir (PLTR) surged 12%, Lockheed (LMT) +8%, Raytheon +9%. Airlines and consumer discretionary names fell sharply on higher fuel cost expectations.",
+    source: "Investor's Business Daily",
+    url: "https://www.investors.com/market-trend/stock-market-today/dow-jones-sp500-nasdaq-us-iran-attacks-nvidia-tesla/",
+    category: "finance",
+    time: "Mar 2"
+  },
+  {
+    id: 17,
+    title: "Fertilizer Prices Surge on Iran Conflict, Raising Costs for Tyson, Hormel",
+    snippet: "The Iran conflict is pushing natural gas and fertilizer prices higher, creating downstream cost pressure for food companies including Tyson Foods and Hormel. Agricultural commodity markets are pricing in sustained supply disruption.",
+    full: "The intersection of the Iran conflict and agricultural markets is creating a complex cost chain: rising natural gas prices in the Middle East feed into ammonia production, which feeds into nitrogen fertilizers, which feed into livestock feed costs, which ultimately hit processed food companies. Analysts at several banks raised cost estimates for Tyson (TSN), Hormel (HRL), and other food companies. Fertilizer producers Mosaic (MOS) and Nutrien (NTR) are benefiting, with both stocks up more than 10% this week.",
+    source: "TipRanks",
+    url: "https://www.tipranks.com/news/iran-conflict-sends-fertilizer-prices-higher-raising-cost-risks-for-tyson-hormel-and-food-stocks",
+    category: "finance",
+    time: "Mar 5"
+  },
+
+  // WORLD / GEOPOLITICS
+  {
+    id: 18,
+    title: "Operation Epic Fury: Pentagon Releases Footage of Strikes on Iran",
+    snippet: "Images from U.S. Central Command showed Navy ships and Air Force fighters launching the largest combined strike package against Iranian territory in history, targeting leadership compounds, nuclear facilities, and command infrastructure.",
+    full: "CENTCOM released footage showing the coordinated nature of Operation Epic Fury: carrier-launched F/A-18s, Tomahawk cruise missiles from guided missile destroyers, B-2 stealth bombers operating from Diego Garcia, and Israeli Air Force F-35Is all participated in the first strike wave. The operation targeted Iran's nuclear program, IRGC command structures, and — reportedly — leadership compounds. Iranian state media confirmed Supreme Leader Khamenei was killed in the first 60 seconds of the operation. Iran's military response has been fierce, with IRGC proxy groups striking U.S. assets across Iraq, Syria, and the Gulf.",
+    source: "Defense News",
+    url: "https://www.defensenews.com/video/2026/02/28/pentagon-releases-footage-of-us-fighters-ships-launching-operation-epic-fury/",
+    category: "world",
+    time: "Feb 28"
+  },
+  {
+    id: 19,
+    title: "Regional Conflict Expands: Proxy Strikes Hit Dubai, Kuwait; 4 Americans KIA",
+    snippet: "Iranian proxy groups struck targets across the Middle East following U.S.-Israeli strikes. A missile hit Dubai's port, three F-15E fighters were shot down by Kuwaiti air defenses during a drone attack, and four American service members were killed.",
+    full: "The conflict's regional expansion accelerated through the weekend as Iranian-backed groups launched coordinated strikes on U.S. and allied assets. A missile impact at Dubai's Jebel Ali port caused a fire that threatened container operations at the world's ninth-busiest port. Three U.S. F-15E Strike Eagles were accidentally downed by Kuwaiti Patriot batteries — a fratricide incident that the Pentagon attributed to 'extreme complexity of the multi-axis Iranian drone attack.' All six aircrew safely ejected. President Trump confirmed four total American KIAs and warned additional casualties are 'likely' as the operation enters its second phase.",
+    source: "CBS News",
+    url: "https://www.cbsnews.com/video/regional-conflict-heats-up-in-middle-east-after-us-israeli-strikes-on-iran/",
+    category: "world",
+    time: "Feb 28"
+  },
+  {
+    id: 20,
+    title: "Hegseth Vows End of 'Nation-Building Quagmires' in Landmark Pentagon Address",
+    snippet: "Secretary of War Pete Hegseth, flanked by Joint Chiefs Chairman Gen. Dan Caine, declared a 'tectonic shift' in American military doctrine — no more rules of engagement constraints, no nation-building, and full dominance as the mission.",
+    full: "Pete Hegseth's address to the Joint Force from the Pentagon was remarkable for its departure from conventional defense secretary rhetoric. Framing Operation Epic Fury as justified retribution rather than a defensive action, Hegseth explicitly repudiated the nation-building doctrines of the post-9/11 era. 'No stupid rules of engagement, no nation-building quagmire, no democracy-building exercise,' he said. While refusing to rule out future ground operations, Hegseth insisted the conflict would not become 'endless.' Constitutional scholars and former military officials have raised concerns about the legal framework underpinning the operation.",
+    source: "South Florida Reporter",
+    url: "https://southfloridareporter.com/hegseth-vows-retribution-and-warrior-spirit-in-historic-address-to-joint-force-video/",
+    category: "world",
+    time: "Mar 2"
+  },
+  {
+    id: 21,
+    title: "U.S. Navy Deploys Two Carrier Groups; First Combat Use of LUCAS Attack Drone Confirmed",
+    snippet: "The U.S. Navy confirmed two carrier battle groups are operating in the Middle East and has used the LUCAS one-way attack drone in combat for the first time — a milestone for autonomous weapons deployment in a major conflict.",
+    full: "The USS Gerald Ford (CVN-78) and USS Harry S. Truman (CVN-75) carrier battle groups are both operating in the Eastern Mediterranean and Arabian Sea respectively, representing the largest U.S. naval presence in the region in two decades. The Pentagon confirmed the first combat deployment of the LUCAS (Lethal Unmanned Combat Air System) one-way attack drone — sometimes called a 'kamikaze drone' — which autonomously navigates to targets using AI-powered guidance. Defense analysts called the LUCAS deployment a landmark moment for autonomous weapons in peer-level conflict.",
+    source: "Defense News",
+    url: "https://www.defensenews.com/video/2026/03/02/carriers-in-the-middle-east-and-unmanned-integration-in-warfare-navy-updates/",
+    category: "world",
+    time: "Mar 2"
+  },
+
+  // OPENCLAW
+  {
+    id: 22,
+    title: "'ClawJacked': Critical Flaw Let Malicious Websites Silently Hijack OpenClaw Agents",
+    snippet: "Security firm Oasis discovered that any malicious website could take full control of a locally-running OpenClaw AI agent via WebSocket brute-forcing — no plugins, no extensions, no user interaction required. Patched in v2026.2.25.",
+    full: "The ClawJacked vulnerability is striking in its elegance: OpenClaw's local WebSocket gateway exempted loopback connections from its rate limiter, meaning a browser-based JavaScript attack could guess passwords at hundreds of attempts per second. In lab testing, a common password dictionary was exhausted in under one second. Once authenticated, the attacker gained admin-level control: full access to the agent, its connected tools, stored credentials, file systems, and logs. Oasis responsibly disclosed the issue and the OpenClaw team — all volunteers — pushed a fix within 24 hours. Update to v2026.2.25 or later immediately.",
+    source: "The Hacker News",
+    url: "https://thehackernews.com/2026/02/clawjacked-flaw-lets-malicious-sites.html",
+    category: "openclaw",
+    time: "Feb 28"
+  },
+  {
+    id: 23,
+    title: "40,000+ OpenClaw Instances Exposed to the Public Internet",
+    snippet: "SecurityScorecard found 40,214 publicly exposed OpenClaw instances across 28,663 unique IP addresses — any of which could give attackers full access to AI agents connected to files, calendars, email, and developer tools.",
+    full: "The scale of OpenClaw's misconfiguration problem is alarming: SecurityScorecard's internet scan found over 40,000 instances of OpenClaw bound to public IP addresses rather than localhost, leaving them fully accessible to the internet. This means attackers don't need the ClawJacked exploit — they can simply connect directly. The exposed agents have access to whatever the local user has configured: email accounts, calendars, code repositories, file systems, and in some enterprise cases, internal APIs. OpenClaw's developers have added configuration warnings in the latest version, but the vast majority of exposed instances are running older software.",
+    source: "Dark Reading",
+    url: "https://www.darkreading.com/application-security/critical-openclaw-vulnerability-ai-agent-risks",
+    category: "openclaw",
+    time: "Mar 2"
+  },
+  {
+    id: 24,
+    title: "OpenClaw Becomes GitHub's Most Starred Project — Surpassing React in 3 Months",
+    snippet: "Just 90 days after launch, OpenClaw has overtaken React to become GitHub's most starred project ever, driven by its local-first architecture, integrations with messaging apps and dev tools, and the ClawHub skill marketplace.",
+    full: "OpenClaw's rise on GitHub is unprecedented in the platform's history: no project has ever accumulated stars this quickly, not even React, Vue, or TensorFlow at their peak. The project's appeal is its local-first philosophy — running entirely on the user's machine with no cloud dependency — combined with deep integrations with Slack, Discord, Google Workspace, GitHub, and developer tools. The ClawHub marketplace now has over 2,000 community-built 'skills,' though security researchers have found multiple malicious skills including at least one that functioned as malware, exfiltrating data to an external server.",
+    source: "SecurityWeek",
+    url: "https://www.securityweek.com/openclaw-vulnerability-allowed-malicious-websites-to-hijack-ai-agents/",
+    category: "openclaw",
+    time: "Mar 2"
+  },
+  {
+    id: 25,
+    title: "Five Things You Should Not Do With OpenClaw",
+    snippet: "Forbes outlines critical safety practices: don't expose your gateway publicly, don't install unvetted skills, don't grant shell permissions without understanding the risks, and don't run OpenClaw as root.",
+    full: "Forbes security columnist John Werner identified five critical mistakes OpenClaw users make: (1) Exposing the gateway to the public internet — 40,000+ have done this. (2) Installing community skills without vetting — at least one was found to be functionally malware. (3) Granting shell command permissions without strict scope — gives the agent (and any attacker who compromises it) full OS access. (4) Running OpenClaw with admin/root privileges. (5) Using weak or default passwords on the gateway. The columnist notes the risks are 'not hypothetical' and that real infostealers are actively targeting OpenClaw instances.",
+    source: "Forbes",
+    url: "https://www.forbes.com/sites/johnwerner/2026/03/05/five-things-you-should-not-do-with-openclaw/",
+    category: "openclaw",
+    time: "Mar 5"
+  },
+  {
+    id: 26,
+    title: "OpenClaw Researcher Discloses RCE, SSRF, and Auth Bypass Chains in Core Platform",
+    snippet: "Endor Labs found seven new CVEs in OpenClaw (CVE-2026-25593 through CVE-2026-26329) including remote code execution, server-side request forgery, and authentication bypass — all now patched in the latest release.",
+    full: "Security firm Endor Labs published a comprehensive vulnerability research report on OpenClaw covering seven distinct CVEs ranging from moderate to critical severity. The most serious chain allowed an attacker to achieve remote code execution via a combination of server-side request forgery (SSRF) and path traversal. Authentication bypass vulnerabilities allowed unauthorized access to the gateway without knowing the password in certain configurations. All vulnerabilities have been patched across OpenClaw versions 2026.1.20 through 2026.2.25. Endor Labs recommends organizations implement governance controls for AI agent identities, treating them with the same rigor as human user accounts.",
+    source: "Infosecurity Magazine",
+    url: "https://www.infosecurity-magazine.com/news/clawjacked-bug-covert-ai-agent/",
+    category: "openclaw",
+    time: "Mar 2"
+  }
+];
+
+const EMAILS = [
+  {
+    id: "19cc10f0d3f43db1",
+    from: "Google",
+    from_email: "no-reply@google.com",
+    subject: "Ava, review your Google Account settings",
+    date: "Mar 5, 2026 9:51 PM",
+    avatar_letter: "G",
+    avatar_color: "#4285F4",
+    unread: true
+  },
+  {
+    id: "19cb69aaed80531d",
+    from: "GitHub",
+    from_email: "noreply@github.com",
+    subject: "[GitHub] A third-party GitHub Application has been added to your account",
+    date: "Mar 3, 2026 9:08 PM",
+    avatar_letter: "G",
+    avatar_color: "#24292e",
+    unread: true
+  },
+  {
+    id: "19cb69828b97ac79",
+    from: "Google",
+    from_email: "no-reply@accounts.google.com",
+    subject: "Security alert",
+    date: "Mar 3, 2026 9:05 PM",
+    avatar_letter: "G",
+    avatar_color: "#ea4335",
+    unread: true
+  }
+];
+
+const CALENDAR_EVENTS = [];
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+
+function catColor(cat) {
+  const map = { top: '#1d9bf0', ai: '#7856ff', finance: '#00ba7c', tech: '#ff7a00', world: '#f4212e', openclaw: '#ff3cac' };
+  return map[cat] || '#8b98a5';
+}
+
+function catLabel(cat) {
+  const map = { top: 'Top', ai: 'AI', finance: 'Finance', tech: 'Tech', world: 'World', openclaw: 'OpenClaw' };
+  return map[cat] || cat;
+}
+
+function sourceInitial(source) { return source.charAt(0).toUpperCase(); }
+
+function sourceColor(source) {
+  const hash = source.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const colors = ['#1d9bf0','#7856ff','#00ba7c','#ff7a00','#f4212e','#ff3cac','#ffd400','#536471'];
+  return colors[hash % colors.length];
+}
+
+// ── RENDER FUNCTIONS ─────────────────────────────────────────────────────────
+
+function renderListItems(articles, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = articles.map((a, i) => `
+    <div class="list-item" id="list-${a.id}" onclick="toggleList(${a.id})">
+      <div class="list-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="list-content">
+        <div class="list-title">${a.title}</div>
+        <div class="list-snippet">${a.snippet}</div>
+        <div class="list-expanded-text" id="listexp-${a.id}" style="display:none">${a.full}</div>
+        <div class="list-footer">
+          <div class="list-footer-source">
+            <div class="source-icon" style="background:${sourceColor(a.source)};color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;">${sourceInitial(a.source)}</div>
+            ${a.source}
+          </div>
+          <span class="list-time">${a.time}</span>
+          <a class="list-link" href="${a.url}" target="_blank" onclick="event.stopPropagation()">Read →</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleList(id) {
+  const item = document.getElementById('list-' + id);
+  const exp = document.getElementById('listexp-' + id);
+  if (!item || !exp) return;
+  const isOpen = item.classList.contains('expanded');
+  item.classList.toggle('expanded', !isOpen);
+  exp.style.display = isOpen ? 'none' : 'block';
+}
+
+function renderCards(articles, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = articles.map(a => `
+    <div class="card" id="card-${a.id}" onclick="toggleCard(${a.id})">
+      <div class="cat-pill" style="background:${catColor(a.category)};color:#fff;">${catLabel(a.category)}</div>
+      <div class="card-header">
+        <div class="card-source">
+          <div class="source-icon" style="background:${sourceColor(a.source)};color:#fff;">${sourceInitial(a.source)}</div>
+          <span class="card-source-name">${a.source}</span>
+        </div>
+        <span class="card-meta">${a.time}</span>
+      </div>
+      <div class="card-title">${a.title}</div>
+      <div class="card-snippet">${a.snippet}</div>
+      <div class="card-expand">
+        <div class="card-full-text">${a.full}</div>
+        <div class="card-actions">
+          <span class="card-expand-btn">Collapse <span class="chevron">▲</span></span>
+          <a class="card-read-link" href="${a.url}" target="_blank" onclick="event.stopPropagation()">Read full story →</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  if (!card) return;
+  card.classList.toggle('expanded');
+}
+
+function renderSidebar(articles, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = articles.map(a => `
+    <div class="sidebar-card" onclick="window.open('${a.url}','_blank')">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+        <div class="source-icon" style="background:${catColor(a.category)};color:#fff;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;">${sourceInitial(a.source)}</div>
+        <span style="font-size:11px;color:var(--text3);font-weight:600;">${a.source}</span>
+        <span style="font-size:10px;color:var(--text3);margin-left:auto;">${a.time}</span>
+      </div>
+      <div class="sidebar-card-title">${a.title}</div>
+    </div>
+  `).join('');
+}
+
+function renderEmails() {
+  const el = document.getElementById('emailList');
+  if (!el) return;
+  el.innerHTML = EMAILS.map(e => `
+    <div class="email-item">
+      <div class="email-avatar" style="background:${e.avatar_color};color:#fff;">${e.avatar_letter}</div>
+      <div class="email-body">
+        <div class="email-from">${e.from} <span style="font-weight:400;color:var(--text3);font-size:12px;">&lt;${e.from_email}&gt;</span></div>
+        <div class="email-subject">${e.subject}</div>
+      </div>
+      <div>
+        <div class="email-date">${e.date}</div>
+        ${e.unread ? '<div style="display:flex;justify-content:flex-end;margin-top:4px;"><div class="unread-dot"></div></div>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCalendar() {
+  const el = document.getElementById('calContent');
+  if (!el) return;
+  if (CALENDAR_EVENTS.length === 0) {
+    el.innerHTML = `
+      <div class="cal-empty">
+        <div class="cal-empty-icon">📅</div>
+        <div>No events scheduled for today</div>
+        <div style="margin-top:4px;font-size:11px;color:var(--text3);">Thursday, March 5, 2026</div>
+      </div>`;
+  }
+}
+
+// ── TABS ────────────────────────────────────────────────────────────────────
+
+function initTabs() {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      const id = 'tab-' + tab.dataset.tab;
+      const content = document.getElementById(id);
+      if (content) content.classList.add('active');
+    });
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+
+function init() {
+  // Update generated time
+  document.getElementById('genTime').textContent = 'Generated ' + GENERATED;
+  document.getElementById('footerTime').textContent = GENERATED;
+
+  // Weather
+  document.getElementById('wTemp').textContent = WEATHER.temp_c + '°C / ' + WEATHER.temp_f + '°F';
+  document.getElementById('wDesc').textContent = WEATHER.desc;
+  document.getElementById('wHumidity').textContent = '· ' + WEATHER.humidity + '% humidity · ' + WEATHER.wind_dir + ' ' + WEATHER.wind_mph + 'mph';
+
+  // Category groups
+  const byCategory = {
+    top: ARTICLES.filter(a => a.category === 'top'),
+    ai: ARTICLES.filter(a => a.category === 'ai'),
+    finance: ARTICLES.filter(a => a.category === 'finance'),
+    world: ARTICLES.filter(a => a.category === 'world'),
+    openclaw: ARTICLES.filter(a => a.category === 'openclaw'),
+  };
+
+  // All tab: featured cards + sidebar
+  const mainArticles = [
+    byCategory.ai[0], byCategory.ai[1], byCategory.finance[0],
+    byCategory.finance[1], byCategory.world[2], byCategory.world[3]
+  ].filter(Boolean);
+  const sidebarArticles = [
+    byCategory.top[1], byCategory.top[2], byCategory.top[3],
+    byCategory.openclaw[0], byCategory.openclaw[1]
+  ].filter(Boolean);
+
+  renderCards(mainArticles, 'allMainCards');
+  renderSidebar(sidebarArticles, 'allSidebar');
+
+  // Category tabs
+  renderListItems(byCategory.top, 'topList');
+  renderListItems([...byCategory.ai], 'aiList');
+  renderListItems(byCategory.finance, 'financeList');
+  renderListItems(byCategory.world, 'worldList');
+  renderListItems(byCategory.openclaw, 'openclawList');
+
+  // Email & Calendar
+  renderEmails();
+  renderCalendar();
+
+  // Tabs
+  initTabs();
+
+  // Email badge
+  const unread = EMAILS.filter(e => e.unread).length;
+  document.getElementById('emailBadge').textContent = unread;
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
